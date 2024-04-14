@@ -1,0 +1,9 @@
+app:
+  name: bestrong
+replicaCount: 2
+image:
+  repository: crbestrongprodeastus001.azurecr.io/bestrongwebapp
+  tag: v1
+service: 
+  type: LoadBalancer
+  port: 80
