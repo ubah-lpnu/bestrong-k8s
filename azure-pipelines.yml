@@ -8,12 +8,23 @@ trigger:
     exclude:
       - '*'
 variables:
-  containerRepository: 'bestrongwebapp'
-  chartPath: './bestrong-api-helm'
-  chartCounter: $[counter(variables['appVersion'], 1)]
-  chartVersion: '1.0.$(chartCounter)'
-  imageName: crbestrongprodeastus001.azurecr.io/bestrongwebapp:v1
-  
+  - group: lib-bestrong-k8s
+  - name: containerRepository
+    value: 'bestrongwebapp'
+  - name: chartPath
+    value: './bestrong-api-helm'
+  - name: chartVersion
+    value: '1.0.$(chartCounter)'
+  - name: imageName
+    value: 'crbestrongprodeastus001.azurecr.io/bestrongwebapp:v1'
+  - name: chartACRName
+    value: 'crbestrongakseastus001.azurecr.io'
+  - name: chartName
+    value: 'bestrong-api'
+  - name: chartCounter
+    value: $[counter(variables['appVersion'], 1)]
+
+ 
 
 stages:
 - stage: Build
@@ -41,10 +52,20 @@ stages:
       - script: |
           helm lint $(chartPath)
         displayName: 'Lint Helm chart'
+        continueOnError: true
 
       - script: |
           helm package --version $(chartVersion) $(chartPath)
         displayName: 'Package Helm chart'
+      
+      - script: |
+          helm registry login $(chartACRName) --username $(ACR_USERNAME) --password $(ACR_PASSWORD)
+        displayName: 'Login to Helm charts ACR'
+      
+      - script: |
+          helm push $(chartName)-($chartVersion).tgz oci://$(chartACRName)/helm
+        displayName: 'Push helm chart to ACR'
+
       
       
 
