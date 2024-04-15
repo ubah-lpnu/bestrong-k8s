@@ -99,7 +99,7 @@ stages:
           namespace: 'ns-bestrong'
           command: 'upgrade'
           chartType: 'FilePath'
-          chartPath: '$(Build.StagingDirectory)/$(chartPath)'
+          chartPath: '$(Build.StagingDirectory)'
           chartVersion: '$(chartVersion)'
           releaseName: 'bestrong'
           arguments: '--create-namespace --install'
