@@ -1,0 +1,58 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - bestrong-helm-chart/*
+    exclude:
+      - '*'
+variables:
+  containerRepository: 'bestrongwebapp'
+  chartPath: './bestrong-api-helm'
+  chartCounter: $[counter(variables['appVersion'], 1)]
+  chartVersion: '1.0.$(chartCounter)'
+  
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - task: DockerInstaller@0
+        inputs:
+          dockerVersion: '17.09.0-ce'
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'DockerACRResgistry'
+          command: 'login'
+    
+      - script:  docker pull $(imageName)
+        workingDirectory: $(Build.SourcesDirectory)
+        displayName: 'Docker Pull'
+      - task: HelmInstaller@0
+        inputs:
+          helmVersion: '2.14.1'
+          installKubectl: true
+
+      - script: |
+          helm lint $(chartPath)
+        displayName: 'Lint Helm chart'
+
+      - script: |
+          helm package --version $(chartVersion) $(chartPath)
+        displayName: 'Package Helm chart'
+      
+      
+
+#- stage: Deploy
+#  condition: succeeded('Build')
+#  jobs:
+#  - job: Deploy
+#    pool:
+#     vmImage: 'ubuntu-latest'
+#    steps:
+    
+    
