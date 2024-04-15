@@ -86,7 +86,7 @@ stages:
         displayName: 'Login to Helm charts ACR'
 
       - script: |
-          helm pull oci://$(chartACRName).azurecr.io/helm/$(chartName) --version $(chartVersion)
+          helm pull oci://$(chartACRName)/helm/$(chartName) --version $(chartVersion)
         displayName: 'Pull helm chart from ACR'
 
       - task: HelmDeploy@0
