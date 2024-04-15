@@ -86,7 +86,7 @@ stages:
         displayName: 'Login to Helm charts ACR'
 
       - script: |
-          helm pull oci://$(chartACRName)/helm/$(chartName) --version $(chartVersion)
+          helm pull oci://$(chartACRName)/helm/$(chartName) --version $(chartVersion) -d $(Build.ArtifactStagingDirectory)
         displayName: 'Pull helm chart from ACR'
 
       - task: HelmDeploy@0
@@ -98,8 +98,8 @@ stages:
           kubernetesCluster: 'myAKSCluster'
           namespace: 'ns-bestrong'
           command: 'upgrade'
-          chartType: 'Name'
-          chartName: '$(chartName)'
+          chartType: 'FilePath'
+          chartPath: '$(Build.ArtifactStagingDirectory)/$(chartName)-$(chartVersion).tgz'
           chartVersion: '$(chartVersion)'
           releaseName: 'bestrong'
           arguments: '--create-namespace --install'
