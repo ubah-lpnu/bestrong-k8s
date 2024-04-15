@@ -88,19 +88,7 @@ stages:
       - script: |
           helm pull oci://$(chartACRName).azurecr.io/helm/$(chartName) --version $(chartVersion)
         displayName: 'Pull helm chart from ACR'
-      - task: HelmDeploy@0
-        inputs:
-          connectionType: 'Azure Resource Manager'
-          azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
-          azureResourceGroup: 'rg-aks-eastus2'
-          kubernetesCluster: 'myAKSCluster'
-          namespace: 'ns-bestrong'
-          command: 'upgrade'
-          chartType: 'FilePath'
-          chartPath: '$(Build.StagingDirectory)/$(chartPath)'
-          chartVersion: '$(chartVersion)'
-          releaseName: 'bestrong'
-          arguments: '--create-namespace --install'
+
       - task: HelmDeploy@0
         displayName: 'Deploy latest chart to AKS'
         inputs:
