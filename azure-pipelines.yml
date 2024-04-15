@@ -12,7 +12,7 @@ variables:
   chartPath: './bestrong-api-helm'
   chartCounter: $[counter(variables['appVersion'], 1)]
   chartVersion: '1.0.$(chartCounter)'
-  imageName: bestrongwebapp:v1
+  imageName: crbestrongprodeastus001.azurecr.io/bestrongwebapp:v1
   
 
 stages:
