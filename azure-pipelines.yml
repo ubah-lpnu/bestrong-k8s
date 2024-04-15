@@ -108,7 +108,6 @@ stages:
           azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
           azureResourceGroup: 'rg-aks-eastus2'
           kubernetesCluster: 'myAKSCluster'
-          useClusterAdmin: true
           namespace: 'ns-bestrong'
           command: 'upgrade'
           chartType: 'FilePath'
