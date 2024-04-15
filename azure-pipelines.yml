@@ -63,7 +63,7 @@ stages:
         displayName: 'Login to Helm charts ACR'
       
       - script: |
-          helm push $(chartName)-($chartVersion).tgz oci://$(chartACRName)/helm
+          helm push $(chartName)-$(chartVersion).tgz oci://$(chartACRName)/helm
         displayName: 'Push helm chart to ACR'
 
       
