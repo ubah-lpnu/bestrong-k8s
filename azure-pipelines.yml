@@ -23,6 +23,8 @@ variables:
     value: 'bestrong-api'
   - name: chartCounter
     value: $[counter(variables['appVersion'], 1)]
+  - name: colorImage
+    value: 'green'
 
  
 
@@ -33,17 +35,6 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-      - task: DockerInstaller@0
-        inputs:
-          dockerVersion: '17.09.0-ce'
-      - task: Docker@2
-        inputs:
-          containerRegistry: 'DockerACRResgistry'
-          command: 'login'
-    
-      - script:  docker pull $(imageName)
-        workingDirectory: $(Build.SourcesDirectory)
-        displayName: 'Docker Pull'
       - task: HelmInstaller@0
         inputs:
           helmVersion: '2.14.1'
@@ -67,8 +58,6 @@ stages:
         displayName: 'Push helm chart to ACR'
 
       
-      
-
 - stage: Deploy
   condition: and(succeeded('Build'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   jobs:
@@ -88,21 +77,25 @@ stages:
       - script: |
           helm pull oci://$(chartACRName)/helm/$(chartName) --version $(chartVersion) -d $(Build.ArtifactStagingDirectory)
         displayName: 'Pull helm chart from ACR'
-
-      - task: HelmDeploy@0
-        displayName: 'Deploy latest chart to AKS'
+      
+      - task: DockerInstaller@0
         inputs:
-          connectionType: 'Azure Resource Manager'
-          azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
-          azureResourceGroup: 'rg-aks-eastus2'
-          kubernetesCluster: 'myAKSCluster'
-          namespace: 'ns-bestrong'
+          dockerVersion: '17.09.0-ce'
+      
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'DockerHelmACR'
+          command: 'login'
+    
+      - task: HelmDeploy@0
+        inputs:
+          connectionType: 'Kubernetes Service Connection'
+          kubernetesServiceConnection: 'BestrongAKS'
+          namespace: 'default'
           command: 'upgrade'
           chartType: 'FilePath'
           chartPath: '$(Build.ArtifactStagingDirectory)/$(chartName)-$(chartVersion).tgz'
           chartVersion: '$(chartVersion)'
           releaseName: 'bestrong'
-          arguments: '--create-namespace --install'
+          overrideValues: '--set $(colorImage)Image.enabled=true --reuse-values --debug'
       
-
-    
