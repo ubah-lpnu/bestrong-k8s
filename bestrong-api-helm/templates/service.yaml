@@ -1,11 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.app.name }}-api-service
+  name: {{ .Values.app.name }}-service
 spec:
   type: {{ .Values.service.type }}
   selector:
-    app: {{ .Values.app.name }}-api
+    app: {{ .Values.app.name}}
+    slot: {{ .Values.prodSlot }}
   ports:
   - protocol: TCP
     port: {{ .Values.service.port }}

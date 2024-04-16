@@ -1,9 +1,17 @@
 app:
-  name: bestrong
+  name: bestrong-api
 replicaCount: 2
 image:
   repository: crbestrongprodeastus001.azurecr.io/bestrongwebapp
+
+blueImage:
   tag: v1
+  enabled: false
+greenImage:
+  tag: v2
+  enabled: false
 service: 
   type: LoadBalancer
   port: 80
+
+prodSlot: blue
