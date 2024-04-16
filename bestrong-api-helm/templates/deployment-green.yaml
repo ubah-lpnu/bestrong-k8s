@@ -19,7 +19,7 @@ spec:
       - name: {{.Values.app.name}}-green
         image: {{ .Values.image.repository }}:{{ .Values.greenImage.tag}}
         ports:
-        - containerPort: 8443
+        - containerPort: 80
         volumeMounts:
           - name: tls
             mountPath: /etc/tls
