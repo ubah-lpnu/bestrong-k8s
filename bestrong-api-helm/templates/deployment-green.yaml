@@ -1,0 +1,23 @@
+{{ if .Values.greenImage.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.name }}-green
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+      slot: green
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+        slot: green
+    spec:
+      containers:
+      - name: {{.Values.app.name}}-green
+        image: {{ .Values.image.repository }}:{{ .Values.greenImage.tag}}
+        ports:
+        - containerPort: {{ .Values.service.port }}
+{{ end }}
