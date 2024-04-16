@@ -19,5 +19,18 @@ spec:
       - name: {{.Values.app.name}}-green
         image: {{ .Values.image.repository }}:{{ .Values.greenImage.tag}}
         ports:
-        - containerPort: {{ .Values.service.port }}
+        - containerPort: 80
+        volumeMounts:
+          - name: tls
+            mountPath: /etc/tls
+            readOnly: true
+        env:
+          - name: TLS_CERT
+            value: /etc/tls/tls.crt
+          - name: TLS_KEY
+            value: /etc/tls/tls.key
+      volumes:
+        - name: tls
+          secret:
+            secretName: www-tls
 {{ end }}
