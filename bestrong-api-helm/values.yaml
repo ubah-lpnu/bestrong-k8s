@@ -12,6 +12,6 @@ greenImage:
   enabled: false
 service: 
   type: LoadBalancer
-  port: 443
+  port: 80
 
 prodSlot: blue

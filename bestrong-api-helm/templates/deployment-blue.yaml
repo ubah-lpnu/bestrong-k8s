@@ -19,7 +19,7 @@ spec:
       - name: {{ .Values.app.name }}-blue
         image: {{ .Values.image.repository }}:{{ .Values.blueImage.tag }}
         ports:
-        - containerPort: 80
+        - containerPort: {{ .Values.service.port }}
         volumeMounts:
           - name: tls
             mountPath: /etc/tls
