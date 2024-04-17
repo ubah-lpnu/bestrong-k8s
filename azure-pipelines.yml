@@ -114,44 +114,29 @@ stages:
               releaseName: 'bestrong'
               overrideValues: '$(color)Image.enabled=true'
               arguments: '--debug'
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish Helm chart artifact'
+          - task: HelmDeploy@0
+            displayName: Route traffic
             inputs:
-              PathtoPublish: '$(Pipeline.Workspace)'
-              ArtifactName: 'HelmChart'
-        routeTraffic:
-          pool: server
-          steps:
-            - task: ManualValidation@0
-              timeoutInMinutes: 1440
-              inputs:
-                notifyUsers: 'ivan.dvylyuk@gmail'
-                instructions: 'Check new deployment'
-        postRouteTraffic:
-          steps:
-            - task: HelmDeploy@0
-              displayName: Route traffic
-              inputs:
-                connectionType: 'Azure Resource Manager'
-                azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
-                azureResourceGroup: 'rg-bestrong-aks'
-                kubernetesCluster: 'cluster_bestrong'
-                command: 'upgrade'
-                chartType: 'FilePath'
-                chartPath: '$(Pipeline.Workspace)/HelmChart/$(chartName)-$(chartVersion).tgz'
-                chartVersion: '$(chartVersion'
-                releaseName: 'bestrong'
-                overrideValues: 'prodSlot=$(color)'
-                install: false
-                arguments: '--reuse-values --debug'
-            - task: Kubernetes@1
-              displayName: Delete old Deployment
-              inputs:
-                connectionType: 'Kubernetes Service Connection'
-                kubernetesServiceEndpoint: 'BestrongAKS_test'
-                namespace: 'default'
-                command: 'delete'
-                arguments: 'deploy $(chartName)-$(deleteDeployment)'
-                secretType: 'dockerRegistry'
-                containerRegistryType: 'Azure Container Registry'
+              connectionType: 'Azure Resource Manager'
+              azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
+              azureResourceGroup: 'rg-bestrong-aks'
+              kubernetesCluster: 'cluster_bestrong'
+              command: 'upgrade'
+              chartType: 'FilePath'
+              chartPath: '$(Pipeline.Workspace)/HelmChart/$(chartName)-$(chartVersion).tgz'
+              chartVersion: '$(chartVersion'
+              releaseName: 'bestrong'
+              overrideValues: 'prodSlot=$(color)'
+              install: false
+              arguments: '--reuse-values --debug'
+          - task: Kubernetes@1
+            displayName: Delete old Deployment
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: 'BestrongAKS_test'
+              namespace: 'default'
+              command: 'delete'
+              arguments: 'deploy $(chartName)-$(deleteDeployment)'
+              secretType: 'dockerRegistry'
+              containerRegistryType: 'Azure Container Registry'
         
