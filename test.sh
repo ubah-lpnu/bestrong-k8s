@@ -3,7 +3,7 @@ helm_list=$(helm list -o json)
 if [ "$helm_list" = "[]" ]; then
     echo "No deployments found"
     echo "Setting color variable to blue"
-    export color="blue"  # Set environment variable
+    echo "##vso[task.setvariable variable=color;isoutput=true]blue"
 else
     echo "Deployments found"
     deployment_name=$(kubectl get deploy -o jsonpath='{.items[0].metadata.name}')
@@ -14,13 +14,9 @@ else
     # Logic to set color variable based on deploymentColor
     if [ "$deploymentColor" = "blue" ]; then
         echo "Setting color variable to green"
-        export color="green"  # Set environment variable
-        export deleteDeployment="blue"  # Set environment variable for deletion
+        echo "##vso[task.setvariable variable=color;isoutput=true]green"
     else
         echo "Setting color variable to blue"
-        export color="blue"  # Set environment variable
-        export deleteDeployment="green"  # Set environment variable for deletion
+        echo "##vso[task.setvariable variable=color;isoutput=true]blue"
     fi
 fi
-
-echo "Color: $color"
