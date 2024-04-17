@@ -20,17 +20,19 @@ spec:
         image: {{ .Values.image.repository }}:{{ .Values.blueImage.tag }}
         ports:
         - containerPort: {{ .Values.service.port }}
-        volumeMounts:
-          - name: tls
-            mountPath: /etc/tls
-            readOnly: true
+      #   volumeMounts:
+      #     - name: tls
+      #       mountPath: /etc/tls
+      #       readOnly: true
         env:
-          - name: TLS_CERT
-            value: /etc/tls/tls.crt
-          - name: TLS_KEY
-            value: /etc/tls/tls.key
-      volumes:
-        - name: tls
-          secret:
-            secretName: www-tls
+        - name: color
+          value: "blue"
+      #     - name: TLS_CERT
+      #       value: /etc/tls/tls.crt
+      #     - name: TLS_KEY
+      #       value: /etc/tls/tls.key
+      # volumes:
+      #   - name: tls
+      #     secret:
+      #       secretName: www-tls
 {{ end }}

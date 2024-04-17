@@ -2,7 +2,7 @@ app:
   name: bestrong-api
 replicaCount: 2
 image:
-  repository: bestrongwebapi.azurecr.io/bestrongwebapp
+  repository: acrbestrongdocker.azurecr.io/bestrongwebapp
 
 blueImage:
   tag: v1
