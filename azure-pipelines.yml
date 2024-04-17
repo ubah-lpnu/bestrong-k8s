@@ -123,7 +123,7 @@ stages:
               kubernetesCluster: 'cluster_bestrong'
               command: 'upgrade'
               chartType: 'FilePath'
-              chartPath: '$(Pipeline.Workspace)/HelmChart/$(chartName)-$(chartVersion).tgz'
+              chartPath: '$(Pipeline.Workspace)/$(chartName)-$(chartVersion).tgz'
               chartVersion: '$(chartVersion'
               releaseName: 'bestrong'
               overrideValues: 'prodSlot=$(color)'
@@ -139,4 +139,5 @@ stages:
               arguments: 'deploy $(chartName)-$(deleteDeployment)'
               secretType: 'dockerRegistry'
               containerRegistryType: 'Azure Container Registry'
+            condition: ne(variables['deleteDeployment'], 'none')
         
