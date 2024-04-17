@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-    - master
+    - main
     - develop
     - refs/tags/*
 
@@ -9,7 +9,7 @@ pool:
   vmImage: 'ubuntu-18.04'
 
 variables:
-  isMaster: $[eq(variables['Build.SourceBranchName'], 'master')]
+  isMain: $[eq(variables['Build.SourceBranchName'], 'main')]
   isPR: $[eq(variables['Build.Reason'], 'PullRequest')]
   isDevelop: $[eq(variables['Build.SourceBranchName'], 'develop')]
   isTag: $[contains(variables['Build.SourceBranch'], 'refs/tags/')]
@@ -25,7 +25,7 @@ stages:
         workspace:
           clean: all
         displayName: "Print predefined variables job"
-        condition: or(eq(variables.isDevelop, true), eq(variables.isTag, true))
+        condition: or(eq(variables.isMain, true), eq(variables.isTag, true))
         steps:
           - bash: |
               echo "Agent.BuildDirectory: $(Agent.BuildDirectory)"
