@@ -85,7 +85,7 @@ stages:
           azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
           scriptType: 'bash'
           scriptLocation: 'inlineScript'
-          inlineScript: 'az aks get-credentials --resource-group $resourceGroup --name $clusterName'
+          inlineScript: 'az aks get-credentials -n $(clusterName) -g $(resourceGroup) -a'
     
 
       - task: AzureCLI@2
