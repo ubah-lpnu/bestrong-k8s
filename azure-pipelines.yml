@@ -81,7 +81,7 @@ stages:
             displayName: 'Login to Helm charts ACR'
 
           - script: |
-              helm pull oci://$(chartACRName)/helm/$(chartName) --version $(chartVersion) -d $(Build.ArtifactStagingDirectory)
+              helm pull oci://$(chartACRName)/helm/$(chartName) --version $(chartVersion) -d $(Pipeline.Workspace)
             displayName: 'Pull helm chart from ACR'
           
           - task: AzureCLI@2
@@ -109,10 +109,10 @@ stages:
               namespace: 'default'
               command: 'upgrade'
               chartType: 'FilePath'
-              chartPath: '$(Build.ArtifactStagingDirectory)/$(chartName)-$(chartVersion).tgz'
+              chartPath: '$(Pipeline.Workspace)/$(chartName)-$(chartVersion).tgz'
               chartVersion: '$(chartVersion)'
               releaseName: 'bestrong'
-              overrideValues: '$blueImage.enabled=true'
+              overrideValues: '$(color)Image.enabled=true'
               arguments: '--debug'
         routeTraffic:
           pool: server
@@ -133,10 +133,10 @@ stages:
                 kubernetesCluster: 'cluster_bestrong'
                 command: 'upgrade'
                 chartType: 'FilePath'
-                chartPath: '$(Build.ArtifactStagingDirectory)/$(chartName)-$(chartVersion).tgz'
+                chartPath: '$(Pipeline.Workspace)/$(chartName)-$(chartVersion).tgz'
                 chartVersion: '$(chartVersion'
                 releaseName: 'bestrong'
-                overrideValues: 'prodSlot=blue'
+                overrideValues: 'prodSlot=$(color)'
                 install: false
                 arguments: '--reuse-values --debug'
             - task: Kubernetes@1
@@ -146,11 +146,7 @@ stages:
                 kubernetesServiceEndpoint: 'BestrongAKS_test'
                 namespace: 'default'
                 command: 'delete'
-                arguments: 'deploy $(chartName)-green'
+                arguments: 'deploy $(chartName)-$(deleteDeployment)'
                 secretType: 'dockerRegistry'
                 containerRegistryType: 'Azure Container Registry'
-            
-            
-
-
         
