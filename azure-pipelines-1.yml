@@ -6,7 +6,7 @@ trigger:
     - refs/tags/*
 
 pool: 
-  vmImage: 'ubuntu-18.04'
+  vmImage: 'ubuntu-latest'
 
 variables:
   isMain: $[eq(variables['Build.SourceBranchName'], 'main')]
