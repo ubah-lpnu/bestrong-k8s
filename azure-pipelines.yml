@@ -95,13 +95,7 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                ls -l $(Pipeline.Workspace)
-          - task: Bash@3
-            displayName: set executable bit
-            inputs:
-              targetType: 'inline'
-              script: 'chmod +x ./test.sh'
-              workingDirectory: '$(Pipeline.Workspace)'
+                ls -l $(Build.SourcesDirectory)
           - task: AzureCLI@2
             displayName: Change deployment color
             inputs:
@@ -123,7 +117,7 @@ stages:
               chartPath: '$(Build.ArtifactStagingDirectory)/$(chartName)-$(chartVersion).tgz'
               chartVersion: '$(chartVersion)'
               releaseName: 'bestrong'
-              overrideValues: '$(color)Image.enabled=true'
+              overrideValues: '$blueImage.enabled=true'
               arguments: '--debug'
         routeTraffic:
           pool: server
@@ -147,7 +141,7 @@ stages:
                 chartPath: '$(Build.ArtifactStagingDirectory)/$(chartName)-$(chartVersion).tgz'
                 chartVersion: '$(chartVersion'
                 releaseName: 'bestrong'
-                overrideValues: 'prodSlot=$(color)'
+                overrideValues: 'prodSlot=blue'
                 install: false
                 arguments: '--reuse-values --debug'
             - task: Kubernetes@1
@@ -157,7 +151,7 @@ stages:
                 kubernetesServiceEndpoint: 'BestrongAKS_test'
                 namespace: 'default'
                 command: 'delete'
-                arguments: 'deploy $(chartName)-$(deleteDeployment)'
+                arguments: 'deploy $(chartName)-green'
                 secretType: 'dockerRegistry'
                 containerRegistryType: 'Azure Container Registry'
             
