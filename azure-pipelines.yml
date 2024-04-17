@@ -7,18 +7,19 @@ trigger:
       - bestrong-helm-chart/*
     exclude:
       - '*'
+
 variables:
   - group: lib-bestrong-k8s
+  - name: clusterName
+    value: cluster_bestrong
+  - name: resourceGroup
+    value: rg-bestrong-aks
   - name: containerRepository
     value: 'bestrongwebapp'
   - name: chartPath
     value: './bestrong-api-helm'
   - name: chartVersion
     value: '1.0.$(chartCounter)'
-  - name: imageName
-    value: 'crbestrongprodeastus001.azurecr.io/bestrongwebapp:v1'
-  - name: chartACRName
-    value: 'crbestrongakseastus001.azurecr.io'
   - name: chartName
     value: 'bestrong-api'
   - name: chartCounter
@@ -78,24 +79,31 @@ stages:
           helm pull oci://$(chartACRName)/helm/$(chartName) --version $(chartVersion) -d $(Build.ArtifactStagingDirectory)
         displayName: 'Pull helm chart from ACR'
       
-      - task: DockerInstaller@0
+      - task: AzureCLI@2
         inputs:
-          dockerVersion: '17.09.0-ce'
-      
-      - task: Docker@2
-        inputs:
-          containerRegistry: 'DockerHelmACR'
-          command: 'login'
+          azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: 'aks get-credentials --resource-group $resourceGroup --name $clusterName'
     
+      - task: AzureCLI@2
+        inputs:
+          azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
+          scriptType: 'bash'
+          scriptLocation: 'scriptPath'
+          scriptPath: 'test.sh'
+          workingDirectory: '$(Build.SourcesDirectory)'
       - task: HelmDeploy@0
         inputs:
-          connectionType: 'Kubernetes Service Connection'
-          kubernetesServiceConnection: 'BestrongAKS'
+          connectionType: 'Azure Resource Manager'
+          azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
+          azureResourceGroup: 'rg-bestrong-aks'
+          kubernetesCluster: 'cluster_bestrong'
           namespace: 'default'
           command: 'upgrade'
           chartType: 'FilePath'
           chartPath: '$(Build.ArtifactStagingDirectory)/$(chartName)-$(chartVersion).tgz'
           chartVersion: '$(chartVersion)'
           releaseName: 'bestrong'
-          overrideValues: '--set $(colorImage)Image.enabled=true --reuse-values --debug'
+          overrideValues: '--set $(color)Image.enabled=true --reuse-values --debug --install'
       
