@@ -95,14 +95,14 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                ls -l $(Build.SourcesDirectory)
+                ls -l '$(Pipeline.Workspace)/s'
           - task: AzureCLI@2
             displayName: Change deployment color
             inputs:
               azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
               scriptType: 'bash'
               scriptLocation: 'scriptPath'
-              scriptPath: 'test.sh'
+              scriptPath: './test.sh'
               workingDirectory: '$(Build.SourcesDirectory)'
           - task: HelmDeploy@0
             displayName: Deploy new version
