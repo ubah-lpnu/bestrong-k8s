@@ -20,3 +20,5 @@ else
         echo "##vso[task.setvariable variable=color]blue"
     fi
 fi
+
+echo "Color: $color"
