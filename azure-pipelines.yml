@@ -14,6 +14,8 @@ variables:
     value: cluster_bestrong
   - name: resourceGroup
     value: rg-bestrong-aks
+  - name: chartACRName
+    value: crbestrongakseastus001
   - name: containerRepository
     value: 'bestrongwebapp'
   - name: chartPath
