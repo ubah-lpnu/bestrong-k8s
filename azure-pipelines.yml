@@ -90,7 +90,12 @@ stages:
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
               inlineScript: 'az aks get-credentials -n $(clusterName) -g $(resourceGroup)'
-        
+          - task: Bash@3
+            displayName: 'Print contents of working directory'
+            inputs:
+              targetType: 'inline'
+              script: |
+                ls -l $(Build.SourcesDirectory)
           - task: Bash@3
             displayName: set executable bit
             inputs:
