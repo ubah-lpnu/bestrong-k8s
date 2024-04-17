@@ -95,13 +95,13 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                ls -l $(Build.SourcesDirectory)
+                ls -l $(Pipeline.Workspace)
           - task: Bash@3
             displayName: set executable bit
             inputs:
               targetType: 'inline'
               script: 'chmod +x ./test.sh'
-              workingDirectory: '$(Build.SourcesDirectory)'
+              workingDirectory: '$(Pipeline.Workspace)'
           - task: AzureCLI@2
             displayName: Change deployment color
             inputs:
