@@ -4,6 +4,7 @@ if [ "$helm_list" = "[]" ]; then
     echo "No deployments found"
     echo "Setting color variable to blue"
     echo "##vso[task.setvariable variable=color]blue"
+    echo "##vso[task.setvariable variable=deleteDeployment]none"
 else
     echo "Deployments found"
     deployment_name=$(kubectl get deploy -o jsonpath='{.items[0].metadata.name}')
