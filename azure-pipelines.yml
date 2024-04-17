@@ -91,7 +91,11 @@ stages:
               scriptLocation: 'inlineScript'
               inlineScript: 'az aks get-credentials -n $(clusterName) -g $(resourceGroup) -a'
         
-
+          - task: Bash@3
+            displayName: set executable bit
+            inputs:
+              targetType: 'inline'
+              script: 'chmod +x test.sh'
           - task: AzureCLI@2
             displayName: Change deployment color
             inputs:
