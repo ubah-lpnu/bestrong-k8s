@@ -24,8 +24,6 @@ variables:
     value: 'bestrong-api'
   - name: chartCounter
     value: $[counter(variables['appVersion'], 1)]
-  - name: colorImage
-    value: 'green'
 
  
 
