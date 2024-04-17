@@ -108,6 +108,6 @@ stages:
           chartPath: '$(Build.ArtifactStagingDirectory)/$(chartName)-$(chartVersion).tgz'
           chartVersion: '$(chartVersion)'
           releaseName: 'bestrong'
-          overrideValues: '--set $(color)Image.enabled=true --reuse-values --debug'
+          overrideValues: '--set $(color)Image.enabled=true --debug'
 
       
