@@ -95,7 +95,8 @@ stages:
             displayName: set executable bit
             inputs:
               targetType: 'inline'
-              script: 'chmod +x test.sh'
+              script: 'chmod +x ./test.sh'
+              workingDirectory: '$(Build.SourcesDirectory)'
           - task: AzureCLI@2
             displayName: Change deployment color
             inputs:
