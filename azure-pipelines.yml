@@ -62,53 +62,96 @@ stages:
 - stage: Deploy
   condition: and(succeeded('Build'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   jobs:
-  - job: DeployHelmToAKS
+  - deployment: DeployHelmToAKS
     pool:
      vmImage: 'ubuntu-latest'
-    steps:
-      - task: HelmInstaller@0
-        inputs:
-          helmVersion: '2.14.1'
-          installKubectl: true
+    environment: prod
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: HelmInstaller@0
+            inputs:
+              helmVersion: '2.14.1'
+              installKubectl: true
 
-      - script: |
-          helm registry login $(chartACRName) --username $(ACR_USERNAME) --password $(ACR_PASSWORD)
-        displayName: 'Login to Helm charts ACR'
+          - script: |
+              helm registry login $(chartACRName) --username $(ACR_USERNAME) --password $(ACR_PASSWORD)
+            displayName: 'Login to Helm charts ACR'
 
-      - script: |
-          helm pull oci://$(chartACRName)/helm/$(chartName) --version $(chartVersion) -d $(Build.ArtifactStagingDirectory)
-        displayName: 'Pull helm chart from ACR'
-      
-      - task: AzureCLI@2
-        displayName: Login to AKS
-        inputs:
-          azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
-          scriptType: 'bash'
-          scriptLocation: 'inlineScript'
-          inlineScript: 'az aks get-credentials -n $(clusterName) -g $(resourceGroup) -a'
-    
+          - script: |
+              helm pull oci://$(chartACRName)/helm/$(chartName) --version $(chartVersion) -d $(Build.ArtifactStagingDirectory)
+            displayName: 'Pull helm chart from ACR'
+          
+          - task: AzureCLI@2
+            displayName: Login to AKS
+            inputs:
+              azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: 'az aks get-credentials -n $(clusterName) -g $(resourceGroup) -a'
+        
 
-      - task: AzureCLI@2
-        displayName: Change deployment color
-        inputs:
-          azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
-          scriptType: 'bash'
-          scriptLocation: 'scriptPath'
-          scriptPath: 'test.sh'
-          workingDirectory: '$(Build.SourcesDirectory)'
-      - task: HelmDeploy@0
-        inputs:
-          connectionType: 'Azure Resource Manager'
-          azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
-          azureResourceGroup: 'rg-bestrong-aks'
-          kubernetesCluster: 'cluster_bestrong'
-          namespace: 'default'
-          command: 'upgrade'
-          chartType: 'FilePath'
-          chartPath: '$(Build.ArtifactStagingDirectory)/$(chartName)-$(chartVersion).tgz'
-          chartVersion: '$(chartVersion)'
-          releaseName: 'bestrong'
-          overrideValues: '$(color)Image.enabled=true'
-          arguments: '--debug'
+          - task: AzureCLI@2
+            displayName: Change deployment color
+            inputs:
+              azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
+              scriptType: 'bash'
+              scriptLocation: 'scriptPath'
+              scriptPath: 'test.sh'
+              workingDirectory: '$(Build.SourcesDirectory)'
+          - task: HelmDeploy@0
+            displayName: Deploy new version
+            inputs:
+              connectionType: 'Azure Resource Manager'
+              azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
+              azureResourceGroup: 'rg-bestrong-aks'
+              kubernetesCluster: 'cluster_bestrong'
+              namespace: 'default'
+              command: 'upgrade'
+              chartType: 'FilePath'
+              chartPath: '$(Build.ArtifactStagingDirectory)/$(chartName)-$(chartVersion).tgz'
+              chartVersion: '$(chartVersion)'
+              releaseName: 'bestrong'
+              overrideValues: '$(color)Image.enabled=true'
+              arguments: '--debug'
+        routeTraffic:
+          pool: server
+          steps:
+            - task: ManualValidation@0
+              timeoutInMinutes: 1440
+              inputs:
+                notifyUsers: 'ivan.dvylyuk@gmail'
+                instructions: 'Check new deployment'
+        postRouteTraffic:
+          steps:
+            - task: HelmDeploy@0
+              displayName: Route traffic
+              inputs:
+                connectionType: 'Azure Resource Manager'
+                azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
+                azureResourceGroup: 'rg-bestrong-aks'
+                kubernetesCluster: 'cluster_bestrong'
+                command: 'upgrade'
+                chartType: 'FilePath'
+                chartPath: '$(Build.ArtifactStagingDirectory)/$(chartName)-$(chartVersion).tgz'
+                chartVersion: '$(chartVersion'
+                releaseName: 'bestrong'
+                overrideValues: 'prodSlot=$(color)'
+                install: false
+                arguments: '--reuse-values --debug'
+            - task: Kubernetes@1
+              displayName: Delete old Deployment
+              inputs:
+                connectionType: 'Kubernetes Service Connection'
+                kubernetesServiceEndpoint: 'BestrongAKS_test'
+                namespace: 'default'
+                command: 'delete'
+                arguments: 'deploy $(chartName)-$(deleteDeployment)'
+                secretType: 'dockerRegistry'
+                containerRegistryType: 'Azure Container Registry'
+            
+            
 
-      
+
+        
