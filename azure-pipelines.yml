@@ -114,6 +114,11 @@ stages:
               releaseName: 'bestrong'
               overrideValues: '$(color)Image.enabled=true'
               arguments: '--debug'
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Helm chart artifact'
+            inputs:
+              PathtoPublish: '$(Pipeline.Workspace)'
+              ArtifactName: 'HelmChart'
         routeTraffic:
           pool: server
           steps:
@@ -133,7 +138,7 @@ stages:
                 kubernetesCluster: 'cluster_bestrong'
                 command: 'upgrade'
                 chartType: 'FilePath'
-                chartPath: '$(Pipeline.Workspace)/$(chartName)-$(chartVersion).tgz'
+                chartPath: '$(Pipeline.Workspace)/HelmChart/$(chartName)-$(chartVersion).tgz'
                 chartVersion: '$(chartVersion'
                 releaseName: 'bestrong'
                 overrideValues: 'prodSlot=$(color)'
