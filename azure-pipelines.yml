@@ -80,13 +80,16 @@ stages:
         displayName: 'Pull helm chart from ACR'
       
       - task: AzureCLI@2
+        displayName: Login to AKS
         inputs:
           azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
           scriptType: 'bash'
           scriptLocation: 'inlineScript'
-          inlineScript: 'aks get-credentials --resource-group $resourceGroup --name $clusterName'
+          inlineScript: 'az aks get-credentials --resource-group $resourceGroup --name $clusterName'
     
+
       - task: AzureCLI@2
+        displayName: Change deployment color
         inputs:
           azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
           scriptType: 'bash'
