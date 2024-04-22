@@ -15,7 +15,7 @@ variables:
   - name: resourceGroup
     value: bestrong-rg
   - name: chartACRName
-    value: 'imagewebregistry.azurecr.io'
+    value: 'crbestrongakseastus001.azurecr.io'
   - name: chartPath
     value: './bestrong-api-helm'
   - name: chartVersion
