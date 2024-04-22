@@ -14,25 +14,27 @@ spec:
       labels:
         app: {{ .Values.app.name }}
         slot: blue
+        monitoring: enabled
     spec:
       containers:
       - name: {{ .Values.app.name }}-blue
         image: {{ .Values.image.repository }}:{{ .Values.blueImage.tag }}
         ports:
         - containerPort: {{ .Values.service.port }}
-      #   volumeMounts:
-      #     - name: tls
-      #       mountPath: /etc/tls
-      #       readOnly: true
+          name: http-metrics
+        volumeMounts:
+          - name: tls
+            mountPath: /etc/tls
+            readOnly: true
         env:
-        - name: color
-          value: "blue"
-      #     - name: TLS_CERT
-      #       value: /etc/tls/tls.crt
-      #     - name: TLS_KEY
-      #       value: /etc/tls/tls.key
-      # volumes:
-      #   - name: tls
-      #     secret:
-      #       secretName: www-tls
+          - name: color
+            value: "blue"
+          - name: TLS_CERT
+            value: /etc/tls/tls.crt
+          - name: TLS_KEY
+            value: /etc/tls/tls.key
+      volumes:
+        - name: tls
+          secret:
+            secretName: www-tls
 {{ end }}
