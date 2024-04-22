@@ -109,7 +109,7 @@ stages:
               chartPath: '$(Pipeline.Workspace)/$(chartName)-$(chartVersion).tgz'
               chartVersion: '$(chartVersion)'
               releaseName: 'bestrong'
-              arguments: '--set $(color)Image.enabled=true --set $(deleteDeployment)Image.enabled=true --debug'
+              arguments: '--set $(color)Image.enabled=true --debug'
           - task: HelmDeploy@0
             displayName: Route traffic
             inputs:
