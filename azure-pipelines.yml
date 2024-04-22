@@ -11,13 +11,11 @@ trigger:
 variables:
   - group: lib-bestrong-k8s
   - name: clusterName
-    value: cluster_bestrong
+    value: bestrong_cluster
   - name: resourceGroup
-    value: rg-bestrong-aks
+    value: bestrong-rg
   - name: chartACRName
-    value: 'crbestrongakseastus001.azurecr.io'
-  - name: containerRepository
-    value: 'bestrongwebapp'
+    value: 'imagewebregistry.azurecr.io'
   - name: chartPath
     value: './bestrong-api-helm'
   - name: chartVersion
@@ -49,7 +47,7 @@ stages:
       - script: |
           helm package --version $(chartVersion) $(chartPath)
         displayName: 'Package Helm chart'
-      
+
       - script: |
           helm registry login $(chartACRName) --username $(ACR_USERNAME) --password $(ACR_PASSWORD)
         displayName: 'Login to Helm charts ACR'
@@ -87,25 +85,24 @@ stages:
           - task: AzureCLI@2
             displayName: Login to AKS
             inputs:
-              azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
+              azureSubscription: 'Azure subscription 1(740d6962-3a0d-48e7-9ccc-a962da968e9f)'
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
               inlineScript: 'az aks get-credentials -n $(clusterName) -g $(resourceGroup)'
           - task: AzureCLI@2
             displayName: Change deployment color
             inputs:
-              azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
+              azureSubscription: 'Azure subscription 1(740d6962-3a0d-48e7-9ccc-a962da968e9f)'
               scriptType: 'bash'
               scriptLocation: 'scriptPath'
               scriptPath: './test.sh'
               workingDirectory: '$(Build.SourcesDirectory)'
+              
           - task: HelmDeploy@0
             displayName: Deploy new version
             inputs:
-              connectionType: 'Azure Resource Manager'
-              azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
-              azureResourceGroup: 'rg-bestrong-aks'
-              kubernetesCluster: 'cluster_bestrong'
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceConnection: 'BestrongAKS'
               namespace: 'default'
               command: 'upgrade'
               chartType: 'FilePath'
@@ -116,10 +113,9 @@ stages:
           - task: HelmDeploy@0
             displayName: Route traffic
             inputs:
-              connectionType: 'Azure Resource Manager'
-              azureSubscription: 'Azure for Students(85bd95c0-eabe-403c-87b6-f72ae70ec867)'
-              azureResourceGroup: 'rg-bestrong-aks'
-              kubernetesCluster: 'cluster_bestrong'
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceConnection: 'BestrongAKS'
+              namespace: 'default'
               command: 'upgrade'
               chartType: 'FilePath'
               chartPath: '$(Pipeline.Workspace)/$(chartName)-$(chartVersion).tgz'
@@ -132,7 +128,7 @@ stages:
             displayName: Delete old Deployment
             inputs:
               connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceEndpoint: 'BestrongAKS_test'
+              kubernetesServiceEndpoint: 'BestrongAKS'
               namespace: 'default'
               command: 'delete'
               arguments: 'deploy $(chartName)-$(deleteDeployment)'
