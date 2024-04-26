@@ -1,0 +1,19 @@
+# certificate.yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: opencost
+spec:
+  secretName: opencost-tls
+  privateKey:
+    rotationPolicy: Always
+  commonName: opencost.bestrongweb.pp.ua
+  dnsNames:
+    - opencost.bestrongweb.pp.ua
+  usages:
+    - digital signature
+    - key encipherment
+    - server auth
+  issuerRef:
+    name: selfsigned
+    kind: ClusterIssuer

@@ -8,7 +8,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     nginx.ingress.kubernetes.io/tls-acme: "false"
 spec:
-  ingressClassName: public
+  ingressClassName: nginx
   tls:
     - hosts:
         - www.bestrongweb.pp.ua
@@ -24,3 +24,4 @@ spec:
             name: bestrong-api-service
             port:
               number: 80
+      

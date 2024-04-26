@@ -1,0 +1,20 @@
+kubeScheduler:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+
+
+grafana:
+  adminPassword: "admin22"
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    ingressClassName: nginx
+    hosts:
+      - grafana.bestrongweb.pp.ua
+    pathType: Prefix
+    tls:
+      - hosts:
+          - grafana.bestrongweb.pp.ua
+        secretName: grafana-tls
